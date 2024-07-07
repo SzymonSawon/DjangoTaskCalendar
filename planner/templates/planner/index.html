@@ -1,0 +1,15 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'planner/style.css' %}">
+
+<h1 class="month_name">{{ dates.first.task_date|date:"F" }}</h1>
+{% if dates %}
+<ul>
+    <div class="calendar">
+        {% for date in dates %}
+        <a class="{% if date.task_amount == 0 %}calendar_day{% else %}calendar_day_busy{% endif %}"
+            href="{% url 'day_tasks' date.id %}">{{date.task_date.day}}</a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>No tasks yet</p>
+    {% endif %}

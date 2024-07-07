@@ -1,0 +1,22 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'planner/style.css' %}">
+
+<h1>{{ today.task_date }}</h1>
+    <ul>
+        {%for task in today.task_set.all %}
+        <li class="task-item">
+            <div class="task">
+                <p class="task_name">{{task.name}}<p>
+                <form action="{% url 'delete_task' task.id %}" method="post"">
+                    {% csrf_token %}
+                    <input class="delete" type="submit" value="X">
+                </form>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+
+<form action="{% url 'create_task' today.id %}" method="post">
+    {% csrf_token %}
+    {{form }}
+</form>

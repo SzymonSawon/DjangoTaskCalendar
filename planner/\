@@ -1,0 +1,51 @@
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import TaskList, Task
+from .forms import TaskForm, TaskStateForm
+
+
+def index(request):
+    dates = TaskList.objects.order_by("-task_date")[:5]
+    context = {
+        "dates":
+            dates,
+    }
+    return render(request, "planner/index.html", context)
+
+
+# def day_tasks(request, task_list_id):
+#    today = get_object_or_404(TaskList, pk=task_list_id)
+#    return render(request, "planner/day_tasks.html", {"today": today})
+
+
+# def day_tasks(request, task_list_id):
+#    task_list = get_object_or_404(TaskList, pk=task_list_id)
+#    form = TaskForm(request.POST or None)
+#    return render(request, "planner/day_tasks.html", {"form": form})
+
+def day_tasks(request, task_list_id):
+    today = get_object_or_404(TaskList, pk=task_list_id)
+    return render(request, "planner/day_tasks.html", {"today": today})
+
+
+def delete_task(request, task_id):
+    task = get_object_or_404(Task, pk=task_id)
+    task_list_id = task.task_list.id
+    task.delete()
+    return redirect("day_tasks", task_list_id=task_list_id)
+
+
+def create_task(request, task_list_id):
+    form = TaskForm(request.POST or None)
+    today = get_object_or_404(TaskList, pk=task_list_id)
+    if form.is_valid():
+        task_form = form.save(commit=False)
+        task_form.task_list = today
+        task_form.save()
+    return redirect("day_tasks", task_list_id=task_list_id)
+
+
+def complete_task(request, task_id):
+    task = get_object_or_404(Task, pk=task_id)
+    task_list_id = task.task_list.id
+    task.state = True
+    return redirect("day_tasks", task_list_id=task_list_id)
